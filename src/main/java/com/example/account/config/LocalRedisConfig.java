@@ -6,6 +6,8 @@ import redis.embedded.RedisServer;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 @Configuration
 public class LocalRedisConfig {
@@ -15,10 +17,17 @@ public class LocalRedisConfig {
     private RedisServer redisServer;
 
     @PostConstruct
-    public void startRedis() {
-        redisServer = new RedisServer(redisPort);
+    public void startRedis() throws IOException, URISyntaxException {
+        //redisServer = new RedisServer(redisPort);
+        redisServer = RedisServer.builder()
+                .port(redisPort)
+                //.redisExecProvider(customRedisExec) //com.github.kstyrc (not com.orange.redis-embedded)
+                .setting("maxmemory 128M") //maxheap 128M
+                .build();
         redisServer.start();
     }
+        //redisServer.start();
+
 
     @PreDestroy
     public void stopRedis() {
